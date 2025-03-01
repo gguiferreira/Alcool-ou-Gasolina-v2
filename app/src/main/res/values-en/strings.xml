@@ -1,0 +1,15 @@
+<resources>
+    <string name="app_name">Gasoline or Alcohol</string>
+    <string name="add_station">Add Gas Station</string>
+    <string name="station_name">Station Name</string>
+    <string name="alcohol_price">Alcohol Price</string>
+    <string name="gas_price">Gasoline Price</string>
+    <string name="save">Save</string>
+    <string name="list_stations">Gas Stations List</string>
+    <string name="station_details">Station Details</string>
+    <string name="update">Save Changes</string>
+    <string name="delete">Delete Station</string>
+    <string name="location">Location</string>
+    <string name="date">Date</string>
+
+</resources>
