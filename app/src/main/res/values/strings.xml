@@ -11,5 +11,10 @@
     <string name="delete">Excluir Posto</string>
     <string name="location">Localização</string>
     <string name="date">Data</string>
+    <string name="calculate_best_option">Calcular</string>
+    <string name="use_75">75%</string>
+    <string name="use_70">70%</string>
+
+
 
 </resources>

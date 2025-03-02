@@ -2,6 +2,7 @@ package com.example.gasolinaoualcool
 
 import android.Manifest
 import android.content.Context
+import android.content.SharedPreferences
 import android.content.pm.PackageManager
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -43,12 +44,16 @@ class MainActivity : ComponentActivity() {
 
 @Composable
 fun GasolinaOuAlcoolScreen(context: Context, onNavigateToList: () -> Unit) {
-    val fuelRepository = remember { FuelRepository(context) }
+    val sharedPreferences = remember { context.getSharedPreferences("AppPrefs", Context.MODE_PRIVATE) }
+    var isSeventyPercent by remember { mutableStateOf(loadSwitchState(sharedPreferences)) }
     var name by remember { mutableStateOf("") }
     var alcoolPrice by remember { mutableStateOf("") }
     var gasPrice by remember { mutableStateOf("") }
     var userLatitude by remember { mutableStateOf<Double?>(null) }
     var userLongitude by remember { mutableStateOf<Double?>(null) }
+    var resultMessage by remember { mutableStateOf("") }
+
+    val fuelRepository = remember { FuelRepository(context) }
 
     val permissionLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.RequestPermission()
@@ -88,7 +93,7 @@ fun GasolinaOuAlcoolScreen(context: Context, onNavigateToList: () -> Unit) {
             OutlinedTextField(
                 value = name,
                 onValueChange = { name = it },
-                label = {  Text(stringResource(id = R.string.station_name))  },
+                label = { Text(stringResource(id = R.string.station_name)) },
                 modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp)
             )
 
@@ -103,10 +108,51 @@ fun GasolinaOuAlcoolScreen(context: Context, onNavigateToList: () -> Unit) {
             OutlinedTextField(
                 value = gasPrice,
                 onValueChange = { gasPrice = it },
-                label = {Text(stringResource(id = R.string.gas_price))},
+                label = { Text(stringResource(id = R.string.gas_price)) },
                 modifier = Modifier.fillMaxWidth().padding(bottom = 16.dp),
                 keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number)
             )
+
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.padding(bottom = 16.dp)
+            ) {
+                Text(text = stringResource(id = R.string.use_70))
+                Switch(
+                    checked = isSeventyPercent,
+                    onCheckedChange = {
+                        isSeventyPercent = it
+                        saveSwitchState(sharedPreferences, it)
+                    },
+                    modifier = Modifier.padding(start = 8.dp)
+                )
+                Text(text = stringResource(id = R.string.use_75))
+            }
+
+            Button(
+                onClick = {
+                    val alcool = alcoolPrice.toFloatOrNull() ?: 0f
+                    val gasolina = gasPrice.toFloatOrNull() ?: 0f
+                    val threshold = if (isSeventyPercent) 0.7 else 0.75
+
+                    resultMessage = if (alcool <= gasolina * threshold) {
+                        "Álcool é mais vantajoso!"
+                    } else {
+                        "Gasolina é mais vantajosa!"
+                    }
+                },
+                modifier = Modifier.padding(bottom = 16.dp)
+            ) {
+                Text(text = stringResource(id = R.string.calculate_best_option))
+            }
+
+            if (resultMessage.isNotEmpty()) {
+                Text(
+                    text = resultMessage,
+                    style = MaterialTheme.typography.bodyLarge,
+                    modifier = Modifier.padding(bottom = 16.dp)
+                )
+            }
 
             Row {
                 Button(
@@ -137,8 +183,19 @@ fun GasolinaOuAlcoolScreen(context: Context, onNavigateToList: () -> Unit) {
                     onClick = onNavigateToList,
                     modifier = Modifier.weight(1f)
                 ) {
-                    Text(stringResource(id = R.string.list_stations))                }
+                    Text(stringResource(id = R.string.list_stations))
+                }
             }
         }
     }
+}
+
+// Salva o estado do switch no SharedPreferences
+fun saveSwitchState(sharedPreferences: SharedPreferences, state: Boolean) {
+    sharedPreferences.edit().putBoolean("SWITCH_STATE", state).apply()
+}
+
+// Recupera o estado do switch do SharedPreferences
+fun loadSwitchState(sharedPreferences: SharedPreferences): Boolean {
+    return sharedPreferences.getBoolean("SWITCH_STATE", true)
 }

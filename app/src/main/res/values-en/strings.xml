@@ -11,5 +11,10 @@
     <string name="delete">Delete Station</string>
     <string name="location">Location</string>
     <string name="date">Date</string>
+    <string name="calculate_best_option">Calculate</string>
+    <string name="use_75">75%</string>
+    <string name="use_70">70%</string>
+
+
 
 </resources>
